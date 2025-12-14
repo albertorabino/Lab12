@@ -1,6 +1,7 @@
 import flet as ft
 from UI.view import View
 from model.model import Model
+from database.dao import DAO
 
 
 class Controller:
@@ -48,4 +49,29 @@ class Controller:
 
     """Implementare la parte di ricerca del cammino minimo"""
     # TODO
+
+    def handle_cammino_minimo(self,e):
+        try:
+            soglia = float(self._view.txt_soglia.value)
+        except:
+            self._view.show_alert("Inserisci un numero valido per la soglia.")
+            return
+
+        lista = self._model.cammino_minimo(soglia)
+        self._view.lista_visualizzazione_3.controls.clear()
+        year = int(self._view.txt_anno.value)
+        rifugi = DAO.cerca_rifugi(year)
+        result = []
+        try:
+            for i in range(len(lista)):
+                nome_rifugio = next((rifugio.nome for rifugio in rifugi if rifugio.id == lista[i]), "Nome non trovato")
+                result.append([lista[i], nome_rifugio])
+            for i in range(len(result)-1):
+                    self._view.lista_visualizzazione_3.controls.append(
+                        ft.Text(f"{result[i][0]} {result[i][1]}->{result[i+1][0]} {result[i+1][1]}"))
+        except:
+            pass
+        self._view.page.update()
+
+
 
